@@ -1,0 +1,16 @@
+all:
+  vars:
+    ansible_port: 22
+    ansible_user: akiya
+    # ansible_password: &ssh_pass your_password
+    ansible_become: true
+    ansible_become_user: root
+    # ansible_become_password: *ssh_pass
+    ansible_ssh_private_key_file: ~/.ssh/id_rsa
+  hosts:
+    test-01:
+      ansible_host: 192.168.2.131
+    test-02:
+      ansible_host: 192.168.2.132
+    test-03:
+      ansible_host: 192.168.2.133

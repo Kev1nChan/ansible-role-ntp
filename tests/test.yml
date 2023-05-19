@@ -1,0 +1,19 @@
+---
+- name: Install NTP
+  hosts: all
+  tags:
+    - ntp
+    - install
+  roles:
+    - role: ntp
+
+- name: Uninstall NTP
+  hosts: all
+  tags:
+    - ntp
+    - uninstall
+  tasks:
+    - name: Uninstall ntp
+      ansible.builtin.include_role:
+        name: ntp
+        tasks_from: purge.yml

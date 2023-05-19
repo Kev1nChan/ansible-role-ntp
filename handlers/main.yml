@@ -1,0 +1,25 @@
+---
+# handlers file for ntp
+- name: Start ntp service
+  ansible.builtin.systemd:
+    name: "{{ ntp_service_name }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  listen: start ntp
+
+- name: Restart ntp service
+  ansible.builtin.systemd:
+    name: "{{ ntp_service_name }}"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  listen: restart ntp
+
+- name: Stop ntp service
+  ansible.builtin.systemd:
+    name: "{{ ntp_service_name }}"
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+  listen: stop ntp

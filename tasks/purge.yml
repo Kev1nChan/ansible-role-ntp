@@ -1,0 +1,40 @@
+- name: Load a variable file based on the OS type, or a default if not found. Using free-form to specify the file.
+  ansible.builtin.include_vars:
+    file: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_os_family | replace(' ', '_') ~ '.yml' }}"
+        - default.yml
+      paths:
+        - vars
+
+- name: Stop ntp service
+  ansible.builtin.systemd:
+    name: "{{ ntp_service_name }}"
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+
+- name: Uninstall ntp on Debian
+  ansible.builtin.apt:
+    name: ntp
+    state: absent
+  when: ansible_pkg_mgr == 'apt'
+
+- name: Uninstall ntp on RedHat
+  ansible.builtin.yum:
+    name: ntp
+    state: absent
+  when: ansible_pkg_mgr == 'yum'
+
+- name: Uninstall ntp on Fedora
+  ansible.builtin.dnf:
+    name: ntp
+    state: absent
+  when: ansible_pkg_mgr == 'dnf'
+
+- name: Remove ntp configuration file
+  ansible.builtin.file:
+    path: /etc/ntp.conf
+    state: absent

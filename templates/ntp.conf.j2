@@ -1,0 +1,26 @@
+{% set ntp_host_group = (groups['ntp'] is defined | ternary(groups['ntp'], groups['all'])) %}
+# 系统时间与 BIOS 事件的偏差记录文件
+driftfile /var/lib/ntp/ntp.drift
+
+restrict -4 default kod notrap nomodify nopeer noquery limited
+restrict -6 default kod notrap nomodify nopeer noquery limited
+
+restrict 127.0.0.1
+restrict ::1
+
+restrict {{ ansible_default_ipv4['network'] }} mask {{ ansible_default_ipv4['netmask'] }} nomodify notrap
+
+{% if ntp_servers | default([], true) | length != 0 %}
+{% for server in ntp_servers %}
+{{ 'server ' ~ server ~ ' iburst' }}
+{% endfor %}
+{% endif %}
+
+{% if ntp_host_group | length > 1 and ansible_default_ipv4['address'] != hostvars[ntp_host_group[0]]['ansible_default_ipv4']['address'] | default('0.0.0.0', true) %}
+{# 内网上游 ntp server 服务器 #}
+server {{ hostvars[ntp_host_group[0]]['ansible_default_ipv4']['address'] }} prefer
+fudge {{ hostvars[ntp_host_group[0]]['ansible_default_ipv4']['address'] }} stratum 8
+{% else %}
+server 127.127.1.0
+fudge 127.127.1.0 stratum 10
+{% endif %}
